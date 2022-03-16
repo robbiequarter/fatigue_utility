@@ -6,7 +6,7 @@
 rng(123) 
 
 % Initialize parameters
-t = 1:250; % simulate 50 trials
+t = [1:250]'; % simulate 250 trials
 mvc = 10;
 rwds = 2:2:10; % rewards, from paper
 effs = mvc.*[.30 .39 .48 .57 .66]; % %MVC effort, from paper
@@ -65,11 +65,17 @@ for i = 1:length(t)
    
 end
 
-%% Plot stuff
+%% Plot subjective value, P(work), and fatigue states
+
+% smooth splines fits to show avg. trends
+f = fit(t,SVs,'smoothingspline','SmoothingParam',0.1); % lower param = smoother
+p = fit(t,probs,'smoothingspline','SmoothingParam',0.1);
+
 % figure;
 % subplot(3,1,1)
 %     plot(t, SVs);
 %     hold on
+%     plot(f)
 %     yl = ylim;
 %     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5); 
 %     xlabel("Trial"); ylabel("Subjective Value");
@@ -77,6 +83,7 @@ end
 % subplot(3,1,2)
 %     plot(t, probs);
 %     hold on
+%     plot(p)
 %     yline(0.5, 'k-', 'LineWidth',0.5)
 %     yl = ylim;
 %     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5);
@@ -86,7 +93,7 @@ end
 %     plot(t, fat(2:end, 1), t, fat(2:end,2));
 %     xlabel("Trial"); ylabel("Fatigue level"); legend("RF", "UF");
 
-%% Mesh grid plotting P(work) as a function of unique options
+%% Mesh grid plotting P(work) as a function of reward-effort options
 unq = unique(work,'rows');
 cmap = zeros([5 5]);
 cmap1 = zeros([5 5]);
@@ -120,14 +127,16 @@ unq = [unq,aggprobs];
 %     caxis([0 max(probs)]) % should scale colorbar to be the same between plots
 %     xlabel('Reward (credits)'); 
 %     ylabel('Effort (% MVC)');
-%     set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100)
+%     set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100,...
+%     'XTick',rwds,'XTickLabels',rwds)
 % subplot(1,2,2)
 % imagesc((rwds), (effs), cmap2');
 %     colormap bone %winter, summer, gray, cool, bone, copper, pink
 %     caxis([0 max(probs)])  % should scale colorbar to be the same between plots
 %     xlabel('Reward (credits)'); 
 %     ylabel('Effort (% MVC)');
-%     set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100)
+%     set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100,...
+%     'XTick',rwds,'XTickLabels',rwds)
     
 %% Looking at effect of beta on softmax function
 % figure
@@ -148,6 +157,7 @@ subplot(4,2,[1,2])
     hold on
     yl = ylim;
     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5); 
+    plot(f);
     xlabel("Trial"); ylabel("Subjective Value");
 
 subplot(4,2,[3,4])
@@ -156,10 +166,11 @@ subplot(4,2,[3,4])
     yline(0.5, 'k--', 'LineWidth',0.5, 'Alpha',0.5)
     yl = ylim;
     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5);
+    plot(p)
     xlabel("Trial"); ylabel("P(work)");
 
 subplot(4,2,[5,6])
-    plot(t, fat(2:end, 1), t, fat(2:end,2), '-o', 'Marker', '.');
+    plot(t, fat(1:end-1, 1), t, fat(1:end-1,2), '-o', 'Marker', '.');
     xlabel("Trial"); ylabel("Fatigue level"); legend("RF", "UF");
 
 subplot(4,2,7)
@@ -169,7 +180,8 @@ subplot(4,2,7)
         xlabel('Reward (credits)'); 
         ylabel('Effort (% MVC)');
         title('First 2 decisions');
-        set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100)
+        set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100,...
+            'XTick',rwds,'XTickLabels',rwds)
 subplot(4,2,8)
     imagesc((rwds), (effs), cmap2');
         colormap bone %winter, summer, gray, cool, bone, copper, pink
@@ -177,5 +189,6 @@ subplot(4,2,8)
         xlabel('Reward (credits)'); 
         ylabel('Effort (% MVC)');
         title('Last 2 decisions');
-        set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100)
+        set(gca, 'YTick',effs,'YTickLabels',effs./mvc.*100,...
+            'XTick',rwds,'XTickLabels',rwds)
 
