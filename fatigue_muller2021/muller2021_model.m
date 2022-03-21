@@ -2,14 +2,17 @@
 % al., 2021
 %   Supplementary info for paper: https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24927-7/MediaObjects/41467_2021_24927_MOESM1_ESM.pdf
 
+clear all 
+
 % set seed
-rng(123) 
+rng(69) 
 
 % Initialize parameters
-t = [1:250]'; % simulate 250 trials
-mvc = 10;
+t = [1:20]'; % simulate 250 trials
+mvc = 5;
 rwds = 2:2:10; % rewards, from paper
 effs = mvc.*[.30 .39 .48 .57 .66]; % %MVC effort, from paper
+% effs = 2:2:10;
 Trest = 5; % Rest period. Longer rests result in higher proportion of decisions to work
 
 % Initialize subject-specific parameters (between 0 and 1.1)
@@ -21,14 +24,17 @@ theta = 0.018; % UF effort scale (approx. mean = 0.018) - increasing this causes
 
 % Initialize decision landscape
 options = combvec(effs, rwds)';
-work = datasample(repmat(options,10,1),length(t),1,'Replace',false); % reward and effort choices
-rest = [ones([length(t),1]), zeros([length(t),1])]; % rest options, 1 rwd for 0 effort
+work = datasample(repmat(options,10,1),length(t),1,'Replace',false); % effort and reward choices
+rest = [zeros([length(t),1]), ones([length(t),1])]; % rest option: 0 effort, 1 reward
 
 % initialize storage arrays
 SVs = zeros([length(t),1]);
 probs = zeros([length(t),1]);
 decs = zeros([length(t),1]);
 fat = zeros([length(t)+1, 2]); %RF col 1, UF col 2. Initial values = 0 from paper
+
+
+%% Main loop for decision-making 
 
 % Loop and make decisions
 for i = 1:length(t)
@@ -75,7 +81,7 @@ p = fit(t,probs,'smoothingspline','SmoothingParam',0.1);
 % subplot(3,1,1)
 %     plot(t, SVs);
 %     hold on
-%     plot(f)
+%     plot(t,f(t), 'HandleVisibility', 'off')
 %     yl = ylim;
 %     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5); 
 %     xlabel("Trial"); ylabel("Subjective Value");
@@ -83,7 +89,7 @@ p = fit(t,probs,'smoothingspline','SmoothingParam',0.1);
 % subplot(3,1,2)
 %     plot(t, probs);
 %     hold on
-%     plot(p)
+%     plot(t,p(t), 'HandleVisibility', 'off')
 %     yline(0.5, 'k-', 'LineWidth',0.5)
 %     yl = ylim;
 %     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5);
@@ -157,7 +163,7 @@ subplot(4,2,[1,2])
     hold on
     yl = ylim;
     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5); 
-    plot(f);
+    plot(t,f(t), 'HandleVisibility', 'off');
     xlabel("Trial"); ylabel("Subjective Value");
 
 subplot(4,2,[3,4])
@@ -166,7 +172,7 @@ subplot(4,2,[3,4])
     yline(0.5, 'k--', 'LineWidth',0.5, 'Alpha',0.5)
     yl = ylim;
     plot(t,yl(1).*decs, 'r|', 'MarkerFaceColor', 'r', 'MarkerSize', 5);
-    plot(p)
+    plot(t,p(t), 'HandleVisibility', 'off')
     xlabel("Trial"); ylabel("P(work)");
 
 subplot(4,2,[5,6])
