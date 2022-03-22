@@ -3,8 +3,8 @@ function [sv] = rwd(r, T, c0, c1)
 %   Inputs:
 %   Outputs: 
     
-    Pr = @(T,c0,c1) (1./(1 + exp(-c0 - c1))); %Probability of reward as a function of reach time (T)
+    Pr = @(T,c0,c1) (1./(1 + exp(-c0 - c1*T))); %Probability of reward as a function of reach time (T)
 
-    sv = r * Pr(T, c0, c1);
+    sv = (r * Pr(T, c0, c1));
 end
 

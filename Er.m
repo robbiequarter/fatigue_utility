@@ -8,6 +8,6 @@ function [e] = Er(T, a, b)
 %       e: met cost of a reach
 
     e = (a.*T + b./(T)); %reaching cost, basically normal effort cost (no distance, mass, etc.)
-
+ 
 end
 
